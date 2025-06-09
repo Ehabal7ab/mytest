@@ -41,7 +41,7 @@ jobs:
 
       # Run Secret Scan
       - name: Run Secret Scan
-        run: python .github/workflows/scripts/secret_scan.py
+        run: python .github/workflows/scripts/secret_scanner.py
         continue-on-error: true
 
       - name: Show Secret Scan results
