@@ -1,0 +1,68 @@
+name: Security CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  custom-checks:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # مهم لفحص تاريخ Git
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: pip install bandit safety pylint gitpython requests
+
+      # تشغيل SAST
+      - name: Run SAST
+        run: |
+          echo "=== بدء SAST ==="
+          python .github/scripts/sast.py app.py
+          echo "=== انتهى SAST ==="
+
+      # تشغيل SCA
+      - name: Run SCA
+        run: |
+          echo "=== بدء SCA ==="
+          python .github/scripts/sca.py requirements.txt
+          cat sca_results.json || echo "لا توجد نتائج SCA"
+          echo "=== انتهى SCA ==="
+
+      # فحص الأسرار
+      - name: Run Secret Scan
+        run: |
+          echo "=== بدء فحص الأسرار ==="
+          python .github/scripts/secret_scanner.py 
+          cat secrets_found.json || echo "No secrets found"
+          echo "=== انتهى فحص الأسرار ==="
+
+      # فحص تنسيق الكود
+      - name: Run Code Style Check
+        run: |
+          echo "=== بدء Code Style ==="
+          python .github/scripts/code_style.py 
+          cat style_results.json || echo "No style issues"
+          echo "=== انتهى Code Style ==="
+
+      # رفع جميع النتائج
+      - name: Upload Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: scan-results
+          path: |
+            sast_results.json
+            sca_results.json
+            secrets_found.json
+            style_results.json
+            *.log
