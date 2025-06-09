@@ -2,8 +2,7 @@ name: Security CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
 
 jobs:
@@ -11,10 +10,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # مهم لفحص تاريخ Git
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -22,47 +21,57 @@ jobs:
           python-version: "3.10"
 
       - name: Install dependencies
-        run: pip install bandit safety pylint gitpython requests
+        run: pip install requests
 
-      # تشغيل SAST
+      # Run SAST
       - name: Run SAST
-        run: |
-          echo "=== بدء SAST ==="
-          python .github/workflows/scripts/sast.py app.py
-          echo "=== انتهى SAST ==="
+        run: python .github/scripts/sast.py app.py
 
-      # تشغيل SCA
+      - name: Show SAST results
+        run: cat sast_results.json || echo "No SAST issues"
+
+      # Run SCA
       - name: Run SCA
-        run: |
-          echo "=== بدء SCA ==="
-          python .github/workflows/scripts/sca.py requirements.txt
-          cat sca_results.json || echo "لا توجد نتائج SCA"
-          echo "=== انتهى SCA ==="
+        run: python .github/scripts/sca.py requirements.txt
 
-      # فحص الأسرار
+      - name: Show SCA results
+        run: cat sca_results.json || echo "No SCA issues"
+
+      # Run Secret Scan
       - name: Run Secret Scan
-        run: |
-          echo "=== بدء فحص الأسرار ==="
-          python .github/workflows/scripts/secret_scanner.py 
-          cat secrets_found.json || echo "No secrets found"
-          echo "=== انتهى فحص الأسرار ==="
+        run: python .github/scripts/secret_scan.py
 
-      # فحص تنسيق الكود
-      - name: Run Code Style Check
-        run: |
-          echo "=== بدء Code Style ==="
-          python .github/workflows/scripts/code_style.py 
-          cat style_results.json || echo "No style issues"
-          echo "=== انتهى Code Style ==="
+      - name: Show Secret Scan results
+        run: cat secrets_found.json || echo "No secrets found"
 
-      # رفع جميع النتائج
+      # Run Code Style Check
+      - name: Run Code Style
+        run: python .github/scripts/code_style.py
+
+      - name: Show Code Style results
+        run: cat style_results.json || echo "No style issues"
+
+      # Merge all results into full_report.json
+      - name: Merge all results
+        run: |
+          echo "{" > full_report.json
+          echo '"sast":' >> full_report.json && cat sast_results.json >> full_report.json || echo '[]' >> full_report.json
+          echo ',' >> full_report.json
+          echo '"sca":' >> full_report.json && cat sca_results.json >> full_report.json || echo '[]' >> full_report.json
+          echo ',' >> full_report.json
+          echo '"secrets":' >> full_report.json && cat secrets_found.json >> full_report.json || echo '[]' >> full_report.json
+          echo ',' >> full_report.json
+          echo '"style":' >> full_report.json && cat style_results.json >> full_report.json || echo '[]' >> full_report.json
+          echo "}" >> full_report.json
+
+      # Upload all result files
       - name: Upload Results
-  uses: actions/upload-artifact@v4
-  with:
-    name: scan-results
-    path: |
-      sast_results.json
-      sca_results.json
-      secrets_found.json
-      style_results.json
-      *.log
+        uses: actions/upload-artifact@v4
+        with:
+          name: scan-results
+          path: |
+            sast_results.json
+            sca_results.json
+            secrets_found.json
+            style_results.json
+            full_report.json
