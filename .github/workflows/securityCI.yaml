@@ -28,14 +28,14 @@ jobs:
       - name: Run SAST
         run: |
           echo "=== بدء SAST ==="
-          python .github/scripts/sast.py app.py
+          python .github/workflows/scripts/sast.py app.py
           echo "=== انتهى SAST ==="
 
       # تشغيل SCA
       - name: Run SCA
         run: |
           echo "=== بدء SCA ==="
-          python .github/scripts/sca.py requirements.txt
+          python .github/workflows/scripts/sca.py requirements.txt
           cat sca_results.json || echo "لا توجد نتائج SCA"
           echo "=== انتهى SCA ==="
 
@@ -43,7 +43,7 @@ jobs:
       - name: Run Secret Scan
         run: |
           echo "=== بدء فحص الأسرار ==="
-          python .github/scripts/secret_scanner.py 
+          python .github/workflows/scripts/secret_scanner.py 
           cat secrets_found.json || echo "No secrets found"
           echo "=== انتهى فحص الأسرار ==="
 
@@ -51,7 +51,7 @@ jobs:
       - name: Run Code Style Check
         run: |
           echo "=== بدء Code Style ==="
-          python .github/scripts/code_style.py 
+          python .github/workflows/scripts/code_style.py 
           cat style_results.json || echo "No style issues"
           echo "=== انتهى Code Style ==="
 
