@@ -14,7 +14,7 @@ def home():
 
 @app.route('/run', methods=['POST'])
 def run_command():
-    # ❌ SAST vulnerability - Command Injection محتمل
+    # ❌ SAST vulnerability - Command  محتمل
     cmd = request.form.get('cmd')
     os.system(cmd)
     return f"Executed: {cmd}"
