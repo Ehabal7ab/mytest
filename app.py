@@ -21,4 +21,4 @@ def run_command():
 
 if __name__ == '__main__':
     app.run(debug=True)
-print("your coocked")
+print("your not coocked")
