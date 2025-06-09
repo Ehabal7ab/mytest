@@ -1,7 +1,7 @@
 from flask import Flask, request
 import os
 import subprocess  # Unused import (Code St issue)
-import requests  #  نسخة قديمة جداً (SCA)
+import requests  #   قديمة جداً (SCA)
 
 app = Flask(__name__)
 
