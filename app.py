@@ -5,7 +5,7 @@ import requests  #    جداً (SCA)
 
 app = Flask(__name__)
 
-# ❌ Secret key  ( )
+#  Secret key  ( )
 SECRET_KEY = "sk_test_1234567890abcdef"
 
 @app.route('/')
