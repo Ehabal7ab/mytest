@@ -39,7 +39,7 @@ jobs:
       - name: Show SCA results
         run: cat sca_results.json || echo "No SCA issues"
 
-      # Run Secret Scan
+      # Run Secret Scan (custom)
       - name: Run Secret Scan
         run: python .github/workflows/scripts/secret_scanner.py
         continue-on-error: true
@@ -55,6 +55,16 @@ jobs:
       - name: Show Code Style results
         run: cat style_results.json || echo "No style issues"
 
+      # Run Gitleaks Secret Scanner
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        with:
+          args: detect --source . --report-format json --report-path gitleaks-report.json
+        continue-on-error: true
+
+      - name: Show Gitleaks results
+        run: cat gitleaks-report.json || echo "No Gitleaks issues"
+
       # Merge all results into one report
       - name: Merge all results
         run: |
@@ -66,6 +76,8 @@ jobs:
           echo '"secrets":' >> full_report.json && cat secrets_found.json >> full_report.json || echo '[]' >> full_report.json
           echo ',' >> full_report.json
           echo '"style":' >> full_report.json && cat style_results.json >> full_report.json || echo '[]' >> full_report.json
+          echo ',' >> full_report.json
+          echo '"gitleaks":' >> full_report.json && cat gitleaks-report.json >> full_report.json || echo '[]' >> full_report.json
           echo "}" >> full_report.json
 
       # Final check for any issues (this fails the job)
@@ -74,8 +86,9 @@ jobs:
           echo "🔍 Checking scan results for any findings..."
           (grep -q '"desc":' sast_results.json && echo "❌ SAST issues found" && exit 1) || echo "✅ No SAST issues"
           (grep -q '"summary":' sca_results.json && echo "❌ SCA issues found" && exit 1) || echo "✅ No SCA issues"
-          (grep -q '"pattern":' secrets_found.json && echo "❌ Secrets found" && exit 1) || echo "✅ No secrets"
+          (grep -q '"pattern":' secrets_found.json && echo "❌ Custom secrets found" && exit 1) || echo "✅ No custom secrets"
           (grep -q '"issue":' style_results.json && echo "❌ Code style issues found" && exit 1) || echo "✅ Code style clean"
+          (grep -q '"RuleID":' gitleaks-report.json && echo "❌ Gitleaks secrets found" && exit 1) || echo "✅ No Gitleaks issues"
 
       # Upload artifacts
       - name: Upload Results
@@ -87,4 +100,5 @@ jobs:
             sca_results.json
             secrets_found.json
             style_results.json
+            gitleaks-report.json
             full_report.json
