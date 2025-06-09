@@ -57,12 +57,12 @@ jobs:
 
       # رفع جميع النتائج
       - name: Upload Results
-        uses: actions/upload-artifact@v3
-        with:
-          name: scan-results
-          path: |
-            sast_results.json
-            sca_results.json
-            secrets_found.json
-            style_results.json
-            *.log
+  uses: actions/upload-artifact@v4
+  with:
+    name: scan-results
+    path: |
+      sast_results.json
+      sca_results.json
+      secrets_found.json
+      style_results.json
+      *.log
