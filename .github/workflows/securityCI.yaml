@@ -25,28 +25,28 @@ jobs:
 
       # Run SAST
       - name: Run SAST
-        run: python .github/scripts/sast.py app.py
+        run: python .github/workflows/scripts/sast.py app.py
 
       - name: Show SAST results
         run: cat sast_results.json || echo "No SAST issues"
 
       # Run SCA
       - name: Run SCA
-        run: python .github/scripts/sca.py requirements.txt
+        run: python .github/workflows/scripts/sca.py requirements.txt
 
       - name: Show SCA results
         run: cat sca_results.json || echo "No SCA issues"
 
       # Run Secret Scan
       - name: Run Secret Scan
-        run: python .github/scripts/secret_scan.py
+        run: python .github/workflows/scripts/secret_scanner.py
 
       - name: Show Secret Scan results
         run: cat secrets_found.json || echo "No secrets found"
 
       # Run Code Style Check
       - name: Run Code Style
-        run: python .github/scripts/code_style.py
+        run: python .github/workflows/scripts/code_style.py
 
       - name: Show Code Style results
         run: cat style_results.json || echo "No style issues"
