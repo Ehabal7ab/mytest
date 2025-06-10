@@ -5,6 +5,13 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read      
+  checks: write      
+  actions: read  
+  security-events: write 
+  artifacts: write   
+
 jobs:
   custom-checks:
     runs-on: ubuntu-latest
