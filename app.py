@@ -5,7 +5,7 @@ import requests  #    idk
 
 app = Flask(__name__)
 
-#  Secret key  ( )
+#  Secretkey  ( )
 SECRET_KEY = "sk_test_1234567890abcdef"
 
 @app.route('/')
