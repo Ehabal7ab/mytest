@@ -10,7 +10,6 @@ permissions:
   checks: write      
   actions: read  
   security-events: write 
-  artifacts: write   
 
 jobs:
   custom-checks:
