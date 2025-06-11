@@ -31,7 +31,7 @@ jobs:
 
       # Run SAST
       - name: Run SAST
-        run: python .github/workflows/scripts/sast.py app.py
+        run: python .github/workflows/scripts/sast.py app.py /tamplates
         continue-on-error: true
 
       - name: Show SAST results
