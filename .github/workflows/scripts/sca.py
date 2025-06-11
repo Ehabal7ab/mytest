@@ -5,7 +5,6 @@ from urllib.parse import quote
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 def get_vulnerability_details(vuln_id):
-    """استرجاع تفاصيل إضافية عن الثغرة من OSV API"""
     try:
         res = requests.get(f"https://api.osv.dev/v1/vulns/{quote(vuln_id)}")
         res.raise_for_status()
@@ -14,7 +13,6 @@ def get_vulnerability_details(vuln_id):
         return None
 
 def check_package_vulnerabilities(pkg, version):
-    """فحص الثغرات الأمنية لحزمة معينة"""
     try:
         res = requests.post(
             "https://api.osv.dev/v1/query",
@@ -93,9 +91,9 @@ def main():
 
     if vulns:
         vulns.sort(key=lambda x: (
-            -len(x["cves"]), 
+            -len(x["cves"]),
             x["severity"][0]["score"] if x.get("severity") else 0
-        )
+        ))
 
         with open(output_file, "w", encoding="utf-8") as out:
             json.dump({
